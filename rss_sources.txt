@@ -1,0 +1,14 @@
+http://feeds.foxnews.com/foxnews/scitech
+http://rss.cnn.com/rss/cnn_topstories.rss
+http://feeds.feedburner.com/time/topstories
+http://rss.nytimes.com/services/xml/rss/nyt/HomePage.xml
+https://www.yahoo.com/news/rss/topstories
+http://feeds.washingtonpost.com/rss/world
+http://feeds.bbci.co.uk/news/world/rss.xml
+https://www.huffingtonpost.com/section/front-page/feed
+http://rss.cnn.com/rss/cnn_world.rss
+http://abcnews.go.com/abcnews/topstories
+http://www.marketwatch.com/rss/topstories/
+https://www.salon.com/feed/
+http://www.newyorker.com/services/rss/feeds/everything.xml
+https://nypost.com/feed/
