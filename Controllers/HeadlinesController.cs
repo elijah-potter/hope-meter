@@ -1,5 +1,6 @@
-using Hope.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Hope.Models;
 
 namespace Hope.Controllers;
 
@@ -8,16 +9,17 @@ namespace Hope.Controllers;
 public class HeadlineController : ControllerBase
 {
     private readonly ILogger<HeadlineController> _logger;
+    private readonly DataContext _dataContext;
 
-    public HeadlineController(ILogger<HeadlineController> logger)
+    public HeadlineController(ILogger<HeadlineController> logger, DataContext dataContext)
     {
         _logger = logger;
+        _dataContext = dataContext;
     }
 
     [HttpGet(Name = "GetHeadlines")]
-    public IEnumerable<Headline> Get()
+    public async Task<IEnumerable<Headline>> Get()
     {
-        return Enumerable.Range(1, 5).Select(index => new Headline { })
-        .ToArray();
+        return await _dataContext.Headlines.ToListAsync();
     }
 }

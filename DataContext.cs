@@ -7,15 +7,7 @@ public class DataContext : DbContext
 {
     public DbSet<Headline>? Headlines { get; set; }
 
-    public DataContext()
+    public DataContext(DbContextOptions<DataContext> options) : base(options)
     {
-
-    }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        base.OnConfiguring(optionsBuilder);
-
-        optionsBuilder.UseSqlite("Data Source=./data.db");
     }
 }

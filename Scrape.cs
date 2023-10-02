@@ -1,9 +1,10 @@
+using System.ServiceModel.Syndication;
 using Hope.Models;
-using System.Threading.Channels;
+using System.Xml;
 
 namespace Hope;
 
-public class Scrape
+public static class Scrape
 {
     static private string[] DefaultSources = {
       "http://feeds.foxnews.com/foxnews/scitech",
@@ -13,56 +14,64 @@ public class Scrape
       "https://www.yahoo.com/news/rss/topstories",
       "http://feeds.washingtonpost.com/rss/world",
       "http://feeds.bbci.co.uk/news/world/rss.xml",
-      "https://www.huffingtonpost.com/section/front-page/feed",
       "http://rss.cnn.com/rss/cnn_world.rss",
       "http://abcnews.go.com/abcnews/topstories",
-      "http://www.marketwatch.com/rss/topstories/",
       "https://www.salon.com/feed/",
       "http://www.newyorker.com/services/rss/feeds/everything.xml",
       "https://nypost.com/feed/",
   };
 
-    private Channel<Uri> Queue;
-    private Channel<string> Results;
-    private Task? ScrapeTask;
-
-    public Scrape()
+    public static Task<List<Headline>> ScrapeDefaultSources()
     {
-        Queue = Channel.CreateUnbounded<Uri>();
-        Results = Channel.CreateUnbounded<string>();
+        return FetchAllRSS(DefaultSources.Select(source => new Uri(source)));
     }
 
-    public async void ScrapeDefaultSources(){
-      foreach (var source in DefaultSources){
-        await Queue.Writer.WriteAsync(new Uri(source));
-      }
-    }
-
-    /// <summary>
-    /// Starts a scrape task in the background if there isn't one already running.
-    //// </summary>
-    public void StartScrape(){
-      if (ScrapeTask == null)
-        ScrapeTask = Run(Queue.Reader);
-    }
-
-    private static async Task Run(ChannelReader<Uri> reader)
+    private static async Task<List<Headline>> FetchAllRSS(IEnumerable<Uri> sources)
     {
-        while (await reader.WaitToReadAsync())
+        var allTasks = sources.Select(FailableFetchRSS);
+
+        var allRes = new List<Headline>();
+
+        foreach (var task in allTasks)
         {
-            while (reader.TryRead(out Uri source))
+            var headlines = await task;
+
+            foreach (var headline in headlines)
             {
-                Console.WriteLine(source);
+                allRes.Add(headline);
             }
+        }
+
+        return allRes;
+    }
+
+    private static async Task<IEnumerable<Headline>> FailableFetchRSS(Uri source)
+    {
+        try
+        {
+            return await FetchRSS(source);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.ToString());
+            return new Headline[0];
         }
     }
 
-    private static async ValueTask<Headline> FetchRSS(Uri source){
-      var client = new HttpClient();
+    private static Task<IEnumerable<Headline>> FetchRSS(Uri source)
+    {
+        var client = new HttpClient();
+        return FetchRSS(client, source);
+    }
 
-      var res = await client.GetAsync(source);
-      res.EnsureSuccessStatusCode();
-      
-      return new Headline{};
+    private static async Task<IEnumerable<Headline>> FetchRSS(HttpClient client, Uri source)
+    {
+        var readerSettings = new XmlReaderSettings();
+        readerSettings.Async = true;
+        var reader = XmlReader.Create(source.ToString(), readerSettings);
+        await reader.ReadAsync();
+        var feed = SyndicationFeed.Load(reader);
+
+        return feed.Items.Select(item => new Headline(source, item.Title.Text, DateTime.UtcNow));
     }
 }
