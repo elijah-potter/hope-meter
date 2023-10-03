@@ -20,11 +20,6 @@ public class HopeController : ControllerBase
     [HttpGet(Name = "GetHope")]
     public async Task<double> Get()
     {
-        var analyzer = new SentimentIntensityAnalyzer();
-        var data = await _dataContext.Headlines.Where(h => h.Timestamp > DateTime.Now.AddDays(-1)).Select(h => analyzer.PolarityScores(h.Content)).ToListAsync();
-
-        var sum = data.Select(score => score.Positive - score.Negative).Sum();
-
-        return sum;
+        return await HopeCalculator.CalculateHope(_dataContext);
     }
 }

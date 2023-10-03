@@ -53,10 +53,22 @@
 </div>
 
 
-<div class="w-full h-80 p-32">
-  <h2>What is hope?</h2>
-  <p>Hope is one of the most important factors to human happiness.</p>
-  <p>Hope not only helps us believe the future will be better place, but motivates us to help make it so.</p>
-  <p>Here, I've taken a shot at the impossible: measuring the world's hope, in realtime. It is a kind of "hope-o'-meter", if you will.</p>
+<div class="flex flex-row justify-center pt-10">
+  <div class="w-full h-80" style="width: clamp(50%, 768px, 90%)">
+    <h2>What is hope?</h2>
+    <p>Hope is one of the most important factors to human happiness.</p>
+    <p>Hope not only helps us believe the future will be better place, but motivates us to help make it so.</p>
+    <p>Here, we've taken a shot at the impossible: measuring the world's hope, in realtime. It is a kind of "hope-o'-meter", if you will.</p>
+  
+    <h2>How is it done?</h2>
+    <p>Our methodology, as it stands now, is admittadly somewhat crude. At a high level, it breaks down into three simple steps:</p>
+    <ul class="list-disc pl-10">
+      <li>Scrape a variety of reputable (and unreputable) news organization's websites (Reuters, Associated Press, etc.).</li>
+      <li>Perform sentimant analysis using <a href="https://doi.org/10.1609/icwsm.v8i1.14550">VADER</a>. We sum the "positive" and "negative" outputs.</li>
+      <li>Sum the result over all sources, then offset the result to be relative to all recorded history.</li>
+    </ul>
+  
+  <h2>Questions?</h2>
+  <p>This site is a project by <a href="https://elijahpotter.dev">Elijah Potter</a> for a class at the Colorado School of Mines.</p>
+  </div>
 </div>
-
