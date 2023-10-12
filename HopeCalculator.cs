@@ -1,3 +1,4 @@
+using MathNet.Numerics.Statistics;
 using Microsoft.EntityFrameworkCore;
 using VaderSharp;
 
@@ -10,20 +11,14 @@ public static class HopeCalculator
         var analyzer = new SentimentIntensityAnalyzer();
 
         var lastMonth = await dataContext.Headlines.Where(h => h.Timestamp > DateTime.Now.AddMonths(-1)).ToListAsync();
-        var lastDay = lastMonth.Where(h => h.Timestamp > DateTime.Now.AddDays(-1)).ToList();
+        var lastSamples = lastMonth.Where(h => h.Timestamp > DateTime.Now.AddHours(-2)).ToList();
 
         var lastMonthScores = lastMonth.Select(h => analyzer.PolarityScores(h.Content)).Select(score => score.Positive - score.Negative).ToList();
-        var lastDayScores = lastDay.Select(h => analyzer.PolarityScores(h.Content)).Select(score => score.Positive - score.Negative).ToList();
 
-        var lastMonthStdDev = StdDev(lastMonthScores);
+        var lastSamplesScores = lastSamples.Select(h => analyzer.PolarityScores(h.Content)).Select(score => score.Positive - score.Negative).ToList();
 
-        return (lastDayScores.Average() - lastMonthScores.Average()) / lastMonthStdDev;
-    }
+        var lastMonthStdDev = lastMonthScores.StandardDeviation();
 
-    private static double StdDev(List<double> values)
-    {
-        var avg = values.Average();
-        var sumOfSquaresOfDifferences = values.Select(val => (val - avg) * (val - avg)).Sum();
-        return Math.Sqrt(sumOfSquaresOfDifferences / values.Count);
+        return ((lastSamplesScores.Average() - lastMonthScores.Average()) / lastMonthStdDev * 200) + 50;
     }
 }
