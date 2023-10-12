@@ -18,6 +18,7 @@ public class HopeController : ControllerBase
     }
 
     [HttpGet(Name = "GetHope")]
+    [ResponseCache(Duration = 60)]
     public async Task<double> Get()
     {
         return await HopeCalculator.CalculateHope(_dataContext);

@@ -15,9 +15,15 @@ public static class HopeCalculator
         var lastMonthScores = lastMonth.Select(h => analyzer.PolarityScores(h.Content)).Select(score => score.Positive - score.Negative).ToList();
         var lastDayScores = lastDay.Select(h => analyzer.PolarityScores(h.Content)).Select(score => score.Positive - score.Negative).ToList();
 
-        var lastMonthMin = lastDayScores.Min();
-        var lastMonthMax = lastDayScores.Max();
+        var lastMonthStdDev = StdDev(lastMonthScores);
 
-        return (lastDayScores.Average() - lastMonthMin) / Math.Abs(lastMonthMax - lastMonthMin) * 100;
+        return (lastDayScores.Average() - lastMonthScores.Average()) / lastMonthStdDev;
+    }
+
+    private static double StdDev(List<double> values)
+    {
+        var avg = values.Average();
+        var sumOfSquaresOfDifferences = values.Select(val => (val - avg) * (val - avg)).Sum();
+        return Math.Sqrt(sumOfSquaresOfDifferences / values.Count);
     }
 }
